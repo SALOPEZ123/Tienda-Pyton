@@ -9,5 +9,6 @@ ventana.title("Mi tienda")
 ventana.geometry("1000x600")
 
 cargar_login(ventana)
+cargar_producto(ventana)
 
 ventana.mainloop()
