@@ -1,5 +1,6 @@
 import tkinter as tk
 from Services.mi_sql import conectar
+from View.dashboard import ventana_usuario
 
 def cargar_login(ventana):
     login_panel = tk.Frame(ventana,
@@ -27,13 +28,17 @@ def cargar_login(ventana):
     def btm_continuar():    
         Et_Corro = entrada_correo.get()
         Et_Contr = entrada_contraseña.get()
-
-        print(conectar("SHOW TABLES"))
-
+        consultar_usuario = conectar(f"SELECT * FROM usuario WHERE correo = '{Et_Corro}' AND contraseña = '{Et_Contr}'")
+        if len(consultar_usuario) != 0:
+            print("usuario activo")
+            ventana.destroy()
+            print(consultar_usuario[0][3])
+            ventana_usuario(consultar_usuario)
+        else:
+            print("datos incorrectos")
 
     boton = tk.Button(login_panel, text="Continuar",command=btm_continuar)
     boton.pack()
-
 
     login_panel.pack()
     print("panel login cargado")
