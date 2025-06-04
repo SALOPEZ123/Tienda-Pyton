@@ -41,4 +41,7 @@ def cargar_login(ventana):
     boton.pack()
 
     login_panel.pack()
+    
+    ventana.bind('<Return>', lambda event: btm_continuar())
+
     print("panel login cargado")
