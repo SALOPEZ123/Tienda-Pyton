@@ -37,8 +37,8 @@ def cargar_login(ventana):
         else:
             print("datos incorrectos")
 
-    boton = tk.Button(login_panel, text="Continuar",command=btm_continuar)
-    boton.pack()
+    boton_continuar = tk.Button(login_panel, text="Continuar",command=btm_continuar)
+    boton_continuar.pack()
 
     login_panel.pack()
     
