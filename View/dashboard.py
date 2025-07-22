@@ -10,7 +10,7 @@ def ventana_usuario(datos):
     frame_productos.pack(side="left", fill="both", expand=True)
 
     panel_productos = crear_panel_productos(frame_productos)
-
+    ventana_User.state('zoomed')
     def actualizar_productos():
         nonlocal panel_productos
         panel_productos.destroy()

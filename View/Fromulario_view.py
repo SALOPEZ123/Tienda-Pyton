@@ -1,8 +1,8 @@
+from tkinter import ttk, messagebox
 import tkinter as tk
-from tkinter import ttk
 from Services.mi_sql import conectar
 
-def crear_panel_lateral(parent,actualizar_productos):
+def crear_panel_lateral(parent, actualizar_productos_callback):
     panel_izquierdo = ttk.LabelFrame(
         parent,
         text="Panel Lateral",
@@ -11,48 +11,95 @@ def crear_panel_lateral(parent,actualizar_productos):
     panel_izquierdo.pack(side="left", fill="y", padx=10, pady=10)
 
     ttk.Label(panel_izquierdo, text="Registrar Producto").pack(anchor="w")
-    def producto_new():
-        txt_Producto = ttk.Label(panel_izquierdo, text="Ingrese Producto")
-        txt_Producto.pack()
-    def precio_new():
-        txt_precio = ttk.Label(panel_izquierdo, text="Ingrese Precio")
-        txt_precio.pack()
-    def cantidad_new():
-        txt_cantidad = ttk.Label(panel_izquierdo, text="Ingrese cantidad")
-        txt_cantidad.pack()
-    def categoria_new():
-        txt_categoria = ttk.Label(panel_izquierdo, text="Ingrese categoria")
-        txt_categoria.pack()
-    
-    producto_new()
+
+    # Nombre
+    ttk.Label(panel_izquierdo, text="Ingrese Producto").pack()
     entry_nombre = tk.Entry(panel_izquierdo)
     entry_nombre.pack(pady=5)
 
-    precio_new()
+    # Precio
+    ttk.Label(panel_izquierdo, text="Ingrese Precio").pack()
     entry_precio = tk.Entry(panel_izquierdo)
     entry_precio.pack(pady=5)
 
-    cantidad_new()
+    # Cantidad
+    ttk.Label(panel_izquierdo, text="Ingrese cantidad").pack()
     entry_cantidad = tk.Entry(panel_izquierdo)
     entry_cantidad.pack(pady=5)
 
-    categoria_new()
-    entry_categoria = tk.Entry(panel_izquierdo)
-    entry_categoria.pack(pady=5)
+    # Categoría (Combobox)
+    ttk.Label(panel_izquierdo, text="Seleccione categoría").pack()
 
+    # 🔄 Obtener categorías desde la BD
+    categorias = conectar("SELECT id, nombre FROM categorias")
+    if not categorias:
+        categorias = []
+
+    # Crear diccionario {nombre: id}
+    dict_categorias = {nombre: cid for cid, nombre in categorias}
+    lista_nombres = list(dict_categorias.keys())
+
+    combobox_categoria = ttk.Combobox(panel_izquierdo, values=lista_nombres, state="readonly")
+    combobox_categoria.pack(pady=5)
+
+    # Función para agregar producto
     def btm_agregar_productos():
         nombre = entry_nombre.get().strip()
         precio = entry_precio.get().strip()
         cantidad = entry_cantidad.get().strip()
-        categoria = entry_categoria.get().strip()
+        categoria_nombre = combobox_categoria.get().strip()
+
+        if not (nombre and precio and cantidad and categoria_nombre):
+            messagebox.showwarning("Campos incompletos", "Todos los campos son obligatorios.")
+            return
+
         try:
-            consulta = "INSERT INTO productos (nombre, precio, cantidad, categoria_id) VALUES (%s, %s, %s, %s)"
-            conectar(consulta, (nombre, float(precio), int(cantidad), int(categoria)))
-            actualizar_productos()
+            precio = float(precio)
+            cantidad = int(cantidad)
+            categoria_id = dict_categorias[categoria_nombre]
+        except ValueError:
+            messagebox.showerror("Error", "Precio y cantidad deben ser numéricos.")
+            return
+        except KeyError:
+            messagebox.showerror("Error", "Categoría inválida.")
+            return
+
+        try:
+            query = "INSERT INTO productos (nombre, precio, cantidad, categoria_id) VALUES (%s, %s, %s, %s)"
+            conectar(query, (nombre, precio, cantidad, categoria_id))
+            messagebox.showinfo("Éxito", "Producto insertado correctamente.")
+
+            # Limpiar campos
+            entry_nombre.delete(0, tk.END)
+            entry_precio.delete(0, tk.END)
+            entry_cantidad.delete(0, tk.END)
+            combobox_categoria.set("")
+
+            # Refrescar productos
+            actualizar_productos_callback()
+
         except Exception as e:
-            print("no se pudo XD")
-            
-    btm_insertar = tk.Button(panel_izquierdo, text="Insertar",command=btm_agregar_productos)
-    btm_insertar.pack(pady=10)
+            messagebox.showerror("Error al insertar", str(e))
+
+    tk.Button(panel_izquierdo, text="Insertar", command=btm_agregar_productos).pack(pady=10)
+
+    ttk.Label(panel_izquierdo, text="Filtro").pack
+
+    entry_producto = tk.Entry(panel_izquierdo)
+    entry_producto.pack()
+    
+    def btm_buscar_producto():
+        producto = entry_producto.get().strip()
+        consulta_buscar = conectar(f"SELECT * FROM productos WHERE nombre = '{producto}'")
+        try:
+            consulta_buscar = ttk.Frame(panel_izquierdo,relief="ridge", padding=10)
+
+        except:
+            print("Producto no encontrado")
+
+
+    tk.Button(panel_izquierdo,text="Buscar",command=btm_buscar_producto).pack(pady=10)
+
+
 
     return panel_izquierdo

@@ -11,7 +11,7 @@ def crear_panel_productos(parent):
     contenedor.pack(side="left", fill="both", expand=True, padx=10, pady=10)
 
     try:
-        resultados = conectar("SELECT nombre FROM productos;")
+        resultados = conectar("SELECT nombre FROM productos;")  
     except Exception as e:
         ttk.Label(contenedor, text=f"Error al cargar productos: {e}", foreground="red").pack()
         return contenedor
