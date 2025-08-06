@@ -1,5 +1,5 @@
-from View.Productos_view import crear_panel_productos
-from View.Fromulario_view import crear_panel_lateral
+from paneles.Productos_view import crear_panel_productos
+from paneles.Fromulario_view import crear_panel_lateral
 import tkinter as tk
 
 def ventana_usuario(datos):

@@ -1,7 +1,7 @@
 import tkinter as tk
-from View.header_view import *
-from View.Productos_view import *
-from View.login_view import *
+from paneles.header_view import *
+from paneles.Productos_view import *
+from paneles.login_view import *
 
 
 
